@@ -1,3 +1,13 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import re  # Import regular expressions library
+import nltk
+nltk.download('punkt')
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+
 def plot_categorical_proportions(df):
     """
     Plots bar charts for each categorical variable in a DataFrame, showing the proportion of each category,
