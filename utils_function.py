@@ -10,6 +10,7 @@ from nltk.stem import WordNetLemmatizer
 
 nltk.download('punkt')
 nltk.download('wordnet')
+nltk.download('stopwords')
 nltk.download('omw-1.4')
 
 
@@ -250,8 +251,56 @@ def get_contingency_table_with_percentage_sign(df, product_column='product_menti
     return contingency_table_percentage
 
 
+def generalize_tweets(tweet_text):
+    """
+    Identify if the tweet is about a Google or Apple product, and replace any product-related keywords
+    with 'tecproduct'.
+    
+    Parameters:
+    tweet_text (str): The text of the tweet.
+    
+    Returns:
+    str: 'Google' if the tweet mentions a Google product, 'Apple' if the tweet mentions an Apple product,
+         'Both' if the tweet mentions both, 'Unknown' if it mentions neither.
+    """
+    google_keywords = ['google', 'pixel', 'pixels', 'nexus', 'nexuses', 'android', 'androids', 
+                       'chromebook', 'chromebooks', 'nest', 'nests', 'stadia', 'stadias']
+    apple_keywords = ['apple', 'apples', 'iphone', 'iphones', 'ipad', 'ipads', 'macbook', 
+                      'macbooks', 'imac', 'imacs', 'watch', 'watches', 'airpods', 
+                      'appstore', 'ios', 'itunes']
+    
+    # Ensure tweet_text is a string
+    if not isinstance(tweet_text, str):
+        return 'Unknown'
+    
+    # Replace "app store" with "appstore" before tokenization
+    tweet_text = tweet_text.replace("app store", "appstore")
+    
+    # Replace any occurrences of google_keywords and apple_keywords with 'tecproduct'
+    for keyword in google_keywords + apple_keywords:
+        tweet_text = re.sub(rf'\b{keyword}\b', 'tecproduct', tweet_text, flags=re.IGNORECASE)
+        
+    # Replace @ followed by any text or numbers with 'user'
+    tweet_text = re.sub(r'@\w+', 'user', tweet_text)
+    
+    # Remove # in front of tecproduct if there is
+    tweet_text = re.sub(r'#tecproduct', 'tecproduct', tweet_text)
+    
+    # Replace # followed by any text or numbers with 'trend'
+    tweet_text = re.sub(r'#\w+', 'trend', tweet_text)
+    
+    # Remove URLs
+    tweet_text = re.sub(r'http\S+|www\S+|https\S+', 'urls', tweet_text, flags=re.MULTILINE)
+    
+    # Rename 1g, 2g, 3g, 4g, 5g, 6g, to 'monetwork'
+    tweet_text = re.sub(r'\dg', 'monetwork', tweet_text)
+    
+    return tweet_text
 
-def tweet_text_treatment(df, text_column='tweet_text'):
+
+
+
+def tweet_text_treatment(df, text_column):
     """
     This function processes the text in a specified column of a dataframe by applying several steps:
     1. Lowercasing all text.
@@ -275,7 +324,7 @@ def tweet_text_treatment(df, text_column='tweet_text'):
     df[text_column] = df[text_column].str.lower()
 
     # Step 2: Replace product names, user tags, hashtags, and URLs with general terms
-    df[text_column] = df[text_column].map(identify_product)
+    df[text_column] = df[text_column].map(generalize_tweets)
 
     # Step 3: Remove stopwords from the text
     stopwords_to_remove = stopwords.words('english')
