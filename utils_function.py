@@ -4,9 +4,15 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import re  # Import regular expressions library
 import nltk
-nltk.download('punkt')
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
+
+nltk.download('punkt')
+nltk.download('wordnet')
+nltk.download('omw-1.4')
+
+
 
 def plot_categorical_proportions(df):
     """
@@ -89,7 +95,7 @@ def plot_grouped_charts(df):
                 plt.xticks(rotation=45)
                 plt.show()
 
-          
+
 def txt_clean(txt):
     """
     Clean and preprocess text data for further analysis.
