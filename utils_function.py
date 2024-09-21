@@ -7,6 +7,10 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
+from sklearn.base import TransformerMixin
+from sklearn.metrics import confusion_matrix, precision_score, make_scorer, recall_score, f1_score
+
+
 
 nltk.download('punkt')
 nltk.download('wordnet')
@@ -348,5 +352,65 @@ def tweet_text_treatment(df, text_column):
     df[f'{text_column}_tokenized'] = df[text_column].map(lambda x: word_tokenize(x))
 
     return df
+
+class TfidfToDataFrame(TransformerMixin):
+    def __init__(self, vectorizer):
+        self.vectorizer = vectorizer
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        # Convert the sparse matrix to a dense array and then to a DataFrame with feature names
+        return pd.DataFrame(X.toarray(), columns=self.vectorizer.get_feature_names_out())
+    
+def plot_confusion_matrix_and_metrics(y_test, y_pred, title='Confusion Matrix'):
+    """
+    This function plots a confusion matrix and calculates the weighted F1 score, precision, and recall.
+
+    Parameters:
+    y_test (array-like): True labels
+    y_pred (array-like): Predicted labels
+    title (str): Title for the confusion matrix plot
+
+    Returns:
+    tuple: The weighted F1 score, precision score, and recall score
+    """
+
+    # Predefined labels list
+    labels_list = ["Not Positive emotion", "Positive emotion"]
+
+    # Generate the confusion matrix
+    conf_matrix = confusion_matrix(y_test, y_pred, labels=[0, 1])
+
+    # Calculate percentages
+    conf_matrix_percent = conf_matrix.astype('float') / conf_matrix.sum(axis=1)[:, np.newaxis] * 100
+
+    # Combine the count and the percentage into one annotation
+    labels = [f"{count}\n{percent:.2f}%" for count, percent in zip(conf_matrix.flatten(), conf_matrix_percent.flatten())]
+    labels = np.asarray(labels).reshape(2, 2)
+
+    # Plot the confusion matrix without the color bar
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(conf_matrix, annot=labels, fmt="", cmap="Blues", cbar=False, 
+                xticklabels=labels_list, 
+                yticklabels=labels_list)
+
+    plt.xlabel(r'$\bf{Predicted\ labels}$')
+    plt.ylabel(r'$\bf{True\ labels}$')
+    plt.title(title)
+    plt.show()
+
+    # Calculate weighted precision, recall, and F1 score
+    precision = precision_score(y_test, y_pred, average='weighted')
+    recall = recall_score(y_test, y_pred, average='weighted')
+    f1 = f1_score(y_test, y_pred, average='weighted')
+
+    # Print metrics
+    print(f"Weighted Precision: {precision:.2f}")
+    print(f"Weighted Recall: {recall:.2f}")
+    print(f"Weighted F1 Score: {f1:.2f}")
+
+    return f1, precision, recall
 
 
