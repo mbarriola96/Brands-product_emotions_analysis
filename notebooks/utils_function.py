@@ -302,8 +302,6 @@ def generalize_tweets(tweet_text):
     return tweet_text
 
 
-
-
 def tweet_text_treatment(df, text_column):
     """
     This function processes the text in a specified column of a dataframe by applying several steps:
