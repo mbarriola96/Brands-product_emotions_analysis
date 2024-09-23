@@ -28,7 +28,7 @@ Four notebooks were created in order to analyze the data and based on that predi
 
 - 1. 00_primary_notebook.
 
-	In this notebook, there is a high level overview of all the steps carried out in this 	project in order to do train and test our model. Moreover, the notebooks contains the 	links to the different notebooks in case the reader wants a deeper understanding of the 	processes. 
+In this notebook, there is a high level overview of all the steps carried out in this 	project in order to do train and test our model. Moreover, the notebooks contains the 	links to the different notebooks in case the reader wants a deeper understanding of the 	processes. 
 
 - 2. 01_data_understanding notebook. 
 
