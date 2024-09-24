@@ -22,7 +22,7 @@ nltk.download('omw-1.4')
 def plot_categorical_proportions(df):
     """
     Plots bar charts for each categorical variable in a DataFrame, showing the proportion of each category,
-    ordered by proportion in descending order. Each bar is labeled with its percentage value.
+    ordered by proportion in descending order. Each bar is labeled with its percentage value and count.
 
     Inputs:
     df (pd.DataFrame): The DataFrame to analyze.
@@ -31,16 +31,17 @@ def plot_categorical_proportions(df):
     None
 
     Description:
-    This function identifies categorical variables, calculates the proportion of each category, sorts them,
-    and plots a bar chart for each categorical variable. Labels on the bars display the percentage proportion of each category,
-    excluding the 'tweet_text' column.
+    This function identifies categorical variables, calculates the proportion and count of each category, sorts them,
+    and plots a bar chart for each categorical variable. Labels on the bars display the percentage proportion and
+    the count of each category, excluding the 'tweet_text' column.
     """
     # Excluding 'tweet_text' column
     df = df.drop(columns=['tweet_text'])
     
     for col in df.columns:
-        # Calculating proportions
+        # Calculating proportions and counts
         value_counts = df[col].value_counts(normalize=True).sort_values(ascending=False)
+        absolute_counts = df[col].value_counts().sort_values(ascending=False)
         percentages = value_counts * 100  # Convert proportions to percentages
         
         # Plotting
@@ -49,11 +50,16 @@ def plot_categorical_proportions(df):
         ax.set_title(f'Proportion of Categories in {col}')
         ax.set_ylabel('Percentage')
         
-        # Adding percentage labels on the bars
-        for p in ax.patches:
-            ax.annotate(f'{p.get_height():.2f}%', (p.get_x() + p.get_width() / 2., p.get_height()),
-                        ha='center', va='center', xytext=(0, 10), textcoords='offset points')
+        # Adjusting the y-limit to provide space for the labels
+        plt.ylim(0, max(percentages) + 10)  # Increase y-limit by 10 units for better visibility of labels
+        
+        # Adding percentage and count labels on the bars, positioned above the bar
+        for p, count in zip(ax.patches, absolute_counts):
+            ax.annotate(f'{p.get_height():.2f}%\n({count})', 
+                        (p.get_x() + p.get_width() / 2., p.get_height() + 1),  # Label is placed above the bar
+                        ha='center', va='bottom', fontsize=10, color='black')
 
+        plt.tight_layout()  # Ensure the layout fits within the figure bounds
         plt.show()
         
         
