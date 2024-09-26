@@ -55,7 +55,7 @@ Moreover, we have built the best model to detect tweets with positive sentiment,
 
 This model enables us to gain reasonable insights when extracting positive features from tweets. By focusing on precision, we ensure that the positive sentiment tweets we identify are highly likely to reflect genuine positivity, which is crucial for the reliability of subsequent analyses.
 
-Here we have the confusion matrix of the Decisión Tree Classifier that was selected:
+Here we have the confusion matrix of the XGBoost that was selected:
 
 ![Confusion Matrix](/visualizations/confusion_matrix.png)
 
